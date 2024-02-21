@@ -1,34 +1,24 @@
-import { useFetch } from "./assets/hooks/useFetch";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Home from "./assets/pages/Home";
+import Header from "./assets/components/header/Header";
+import Footer from "./assets/components/footer/footer";
+import Movies from "./assets/pages/Movies";
 
-interface movieProps {
-  id: number;
-  title: string;
-  overview: string;
-  backdrop_path?: string;
-}
+
 
 export default function App() {
-  const { data: repositories } = useFetch<movieProps[]>('https://api.themoviedb.org/3/movie/popular?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR')
 
-  const imageUrl = (path?: string) => `https://image.tmdb.org/t/p/w500${path}`;
 
   return (
-    <>
-      <ul className="p-4">
-        {repositories?.map(movie => (
-          <li key={movie.id}>
-            <strong>{movie.title}</strong>
-            <p>{movie.overview}</p>
-            {movie.backdrop_path && (
-              <img
-                src={imageUrl(movie.backdrop_path)}
-                alt={`Capa do filme ${movie.title}`}
-                className="w-20 h-20 border border-cyan-100"
-              />
-            )}
-          </li>
-        ))}
-      </ul>
-    </>
+    <div className="p-4">
+      <Header/>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />}/>
+          <Route path="/movies" element={<Movies />} /> 
+        </Routes>
+      </BrowserRouter>
+      <Footer />
+    </div>
   );
 }

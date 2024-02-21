@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 
 export function useFetch<T = unknown>(url: string) {
   const [data, setData] = useState<T | null>(null);
+  const [isFetching, setIsFetching] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     axios
@@ -10,8 +12,13 @@ export function useFetch<T = unknown>(url: string) {
       .then((response) => {
         setData(response.data.results);
       })
-      .catch((error) => console.error("Erro: ", error));
+      .catch((err) => {
+        setError(err)
+      })
+      .finally(() => {
+        setIsFetching(false)
+      });
   }, []);
 
-  return { data }
+  return { data, isFetching }
 }
