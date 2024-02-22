@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
-import { useFetch } from "../../hooks/useFetch";
 import axios from "axios";
-// Importe sua função de fazer requisições HTTP, useFetch ou outra
-
 
 interface Genre {
     id: number;
