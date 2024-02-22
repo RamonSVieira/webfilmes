@@ -12,18 +12,34 @@ interface movieProps {
 
 export default function Movies() {
     const [page, setPage] = useState(1);
+    const [search, setSearch] = useState('');
+
     // Requisicao na api
     const { data: repositories, isFetching } =
         useFetch<movieProps[]>(
-            `3/movie/popular?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR&page=${page}`,
+            search
+                ? `3/search/movie?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR&query=${encodeURIComponent(search)}&page=${page}`
+                : `3/movie/popular?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR&page=${page}`,
             {}, //Opções adicionais
-            [page]// dependencias quando alterada, dispara nova requisição
+            [page, search]// dependencias quando alterada, dispara nova requisição
         );
 
     const imageUrl = (path?: string) => `https://image.tmdb.org/t/p/w500${path}`;
 
     return (
         <>
+            <div>
+                <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => {
+                        setSearch(e.target.value)
+                        setPage(1);
+                    }}
+                    placeholder="Pesquisar filmes"
+                />
+            </div>
+
             <ul className="grid grid-cols-4 gap-5 items-stretch">
                 {isFetching && <p>Carregando</p>}
                 {repositories?.map(movie => (
@@ -40,7 +56,7 @@ export default function Movies() {
                 ))}
             </ul>
 
-            <Pagination page={page} setPage={setPage}/>
+            <Pagination page={page} setPage={setPage} />
         </>
     )
 }
