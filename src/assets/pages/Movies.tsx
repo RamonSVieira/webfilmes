@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useFetch } from "../hooks/useFetch";
 import Pagination from "../components/pagination/Pagination";
+import MovieGenresSelect from "../components/movieGenres/MovieGenres";
 
 // Definindo as props de um movie
 interface movieProps {
@@ -13,15 +14,19 @@ interface movieProps {
 export default function Movies() {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
+    const [category, setCategory] = useState('');
+
+    console.log(category);
+
 
     // Requisicao na api
-    const { data: repositories, isFetching } =
+    const { data: movieProps, isFetching } =
         useFetch<movieProps[]>(
             search
-                ? `3/search/movie?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR&query=${encodeURIComponent(search)}&page=${page}`
+                ? `3/search/movie?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR&query=${encodeURIComponent(search)}&page=${page}${category ? `&with_genres=${category}` : ''}`
                 : `3/movie/popular?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR&page=${page}`,
             {}, //Opções adicionais
-            [page, search]// dependencias quando alterada, dispara nova requisição
+            [page, search, category]// dependencias quando alterada, dispara nova requisição
         );
 
     const imageUrl = (path?: string) => `https://image.tmdb.org/t/p/w500${path}`;
@@ -30,6 +35,7 @@ export default function Movies() {
         <>
             <div>
                 <input
+                    className="text-black"
                     type="text"
                     value={search}
                     onChange={(e) => {
@@ -40,9 +46,11 @@ export default function Movies() {
                 />
             </div>
 
+            <MovieGenresSelect />
+
             <ul className="grid grid-cols-4 gap-5 items-stretch">
                 {isFetching && <p>Carregando</p>}
-                {repositories?.map(movie => (
+                {Array.isArray(movieProps) && movieProps.map((movie) => (
                     <li key={movie.id} className="border ">
                         {movie.backdrop_path && (
                             <img
