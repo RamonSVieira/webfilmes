@@ -11,13 +11,14 @@ interface movieProps {
 export default function Movies() {
     // Requisicao na api
     const { data: repositories, isFetching } = 
-        useFetch<movieProps[]>('https://api.themoviedb.org/3/movie/popular?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR')
+        useFetch<movieProps[]>('3/movie/popular?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR')
 
     const imageUrl = (path?: string) => `https://image.tmdb.org/t/p/w500${path}`;
 
     return (
         <>
             <ul className="">
+                {isFetching && <p>Carregando</p>}
                 {repositories?.map(movie => (
                     <li key={movie.id}>
                         <strong>{movie.title}</strong>
