@@ -5,7 +5,7 @@ import useFetch from '../../../hooks/useFetch';
 import { Response } from './types';
 
 const MovieGenres = () => {
-  const { data } = useFetch<Response>('/3/genre/movie/list');
+  const { data } = useFetch<Response>('/3/genre/movie/list', {});  
 
   return (
     <Select>

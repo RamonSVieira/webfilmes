@@ -1,33 +1,35 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { AxiosError, AxiosRequestConfig } from 'axios';
+import { useState, useEffect} from 'react';
+import {  AxiosRequestConfig } from 'axios';
 
 import api from '../services/api';
 
-function useFetch<T = unknown>(url: string, options?: AxiosRequestConfig) {
-  const data = useRef<T>();
+// Função auxiliar para acessar propriedades aninhadas de um objeto usando um caminho de string
+function getNestedObjectValue<T>(obj: Record<string, any>, path: string): T {
+  return path.split('.').reduce((currentObject: any, key: string) => currentObject[key], obj) as T;
+}
 
+function useFetch<T = unknown>(url: string, options?: AxiosRequestConfig, responsePath: string = '', deps: any[] = []) {
+  const [data, setData] = useState<T | null>(null);
   const [isFetching, setIsFetching] = useState(true);
-  const [error, setError] = useState<AxiosError>();
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const { data: response } = await api.get<T>(url, options);
+    api
+      .get(url, options)
+      .then((response) => {
+        // Utiliza a função auxiliar para acessar os dados dinamicamente
+        const resultData = responsePath ? getNestedObjectValue(response.data, responsePath) : response.data;
+        
+        setData(resultData);
+      })
+      .catch((err) => {
+        setError(err)
+      })
+      .finally(() => {
+        setIsFetching(false)
+      });
+  }, [url, responsePath, ...deps,]);
 
-        data.current = response;
-      } catch (err) {
-        setError(err as AxiosError);
-      } finally {
-        setIsFetching(false);
-      }
-    })();
-  }, [url, options]);
-
-  const response = useMemo(
-    () => ({ data: data.current, error, isFetching }),
-    [data, error, isFetching]
-  );
-
-  return response;
+  return { data, error, isFetching }
 }
 export default useFetch;

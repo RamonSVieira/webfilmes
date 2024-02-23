@@ -3,13 +3,7 @@ import useFetch from '../../../hooks/useFetch';
 import Pagination from '../../molecules/pagination';
 import MovieGenres from '../../molecules/movie-genres';
 
-// Definindo as props de um movie
-interface movieProps {
-  id: number;
-  title: string;
-  overview: string;
-  backdrop_path?: string;
-}
+import { movieProps } from './types'
 
 export default function Movies() {
   const [page, setPage] = useState(1);
@@ -17,14 +11,16 @@ export default function Movies() {
   const [category, setCategory] = useState('');
 
   // Requisicao na api
-  const { data: movieProps, isFetching } = useFetch<movieProps[]>(
+  const { data, isFetching } = useFetch<movieProps[]>(
     search
       ? `3/search/movie?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR&query=${encodeURIComponent(
           search
         )}&page=${page}${category ? `&with_genres=${category}` : ''}`
       : `3/movie/popular?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR&page=${page}`,
-    {}
-  );
+    {},
+    'results',
+    [page, search, category]
+  );  
 
   const imageUrl = (path?: string) => `https://image.tmdb.org/t/p/w500${path}`;
 
@@ -47,8 +43,7 @@ export default function Movies() {
 
       <ul className="grid grid-cols-4 gap-5 items-stretch">
         {isFetching && <p>Carregando</p>}
-        {Array.isArray(movieProps) &&
-          movieProps.map((movie) => (
+        {data?.map((movie) => (
             <li key={movie.id} className="border ">
               {movie.backdrop_path && (
                 <img
