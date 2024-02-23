@@ -13,10 +13,10 @@ export default function Movies() {
   // Requisicao na api
   const { data, isFetching } = useFetch<movieProps[]>(
     search
-      ? `3/search/movie?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR&query=${encodeURIComponent(
+      ? `3/search/movie?&query=${encodeURIComponent(
           search
         )}&page=${page}${category ? `&with_genres=${category}` : ''}`
-      : `3/movie/popular?api_key=fffdc0e9123f3943573fdf948dd21681&language=pt-BR&page=${page}`,
+      : `3/movie/popular?&page=${page}`,
     {},
     'results',
     [page, search, category]
